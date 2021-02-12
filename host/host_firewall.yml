@@ -1,0 +1,4 @@
+- name: Host Firewall
+  hosts: all
+  roles:
+    - { role: host/firewall, when: ansible_os_family == "RedHat" }

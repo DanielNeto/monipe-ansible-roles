@@ -1,0 +1,19 @@
+- name: perfSONAR Install PPS and SERIAL Packages
+  yum:
+    name:
+      - pps-tools
+      - setserial
+    state: latest
+    update_cache: yes
+
+- name: perfSONAR | Check PPS startup
+  copy:
+    src: files/gpsinit
+    dest: /etc/init.d/gpsinit
+    mode: 0755
+
+- name: perfSONAR | Configuring GPS link
+  shell: /etc/init.d/gpsinit
+
+- name: perfSONAR | Define PPS startup
+  shell: chkconfig --add gpsinit

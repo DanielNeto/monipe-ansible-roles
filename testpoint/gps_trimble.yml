@@ -1,0 +1,4 @@
+- name: GPS TRIMBLE
+  hosts: all
+  roles:
+    - { role: gps/trimble, when: ((ansible_os_family == "RedHat") and (gps_model is defined and gps_model == "trimble")) }

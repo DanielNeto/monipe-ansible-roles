@@ -1,0 +1,4 @@
+- name: Update Timezone
+  hosts: all
+  roles:
+    - { role: host/tzdata, when: ansible_os_family == "RedHat" }

@@ -1,0 +1,4 @@
+- name: Docker Check Running
+  hosts: all
+  roles:
+    - { role: docker/runrestarted, when: ansible_os_family == "RedHat" }

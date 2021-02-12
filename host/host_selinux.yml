@@ -1,0 +1,4 @@
+- name: Host SeLinux
+  hosts: all
+  roles:
+    - { role: host/selinux, when: ansible_os_family == "RedHat" }

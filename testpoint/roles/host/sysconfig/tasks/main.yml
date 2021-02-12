@@ -1,0 +1,8 @@
+- name: Configure Host SYSCONFIG
+  template:
+    src: templates/monipe.j2
+    dest: /etc/sysctl.d/monipe
+    force: yes
+
+- name: Configure SYSCTL
+  shell: sysctl -p /etc/sysctl.d/monipe

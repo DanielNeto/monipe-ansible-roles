@@ -1,0 +1,43 @@
+- name: Getting testpoint IPS
+  include_vars:
+        file: testpoints.yaml
+        name: testpoints
+
+- name: Configure
+  shell: /usr/sbin/esmond_manage add_user_ip_address {{ testpoints.user }} {{ testpoints.ips | join(' ') }}
+
+- name: Configure MATRIX
+  shell: psconfig remote add --configure-archives {{ item }}
+  with_items: "{{ matrix_config }}"
+
+- name: Configure MATRIX Limits Thresholds
+  shell: psconfig maddash-grid edit --name default_throughput --check-critical-threshold .2 --check-warning-threshold .8
+
+- name: Configure MADDASG MATRIX Title
+  shell: sed -i "s/My perfSONAR Dashboard/RNP perfSONAR Matrix/" /etc/maddash/maddash-webui/config.json
+
+- name: Copy httpd log file
+  copy:
+    src: httpd
+    dest: /etc/logrotate.d/httpd
+
+- name: Copy logrotate.conf file
+  copy:
+    src: logrotate.conf
+    dest: /etc/logrotate.conf
+
+- name: Alter logrotate to hourly
+  copy:
+    src: logrotate
+    dest: /etc/cron.hourly/logrotate
+    mode: 0755
+
+- name: Alter logrotate daily
+  file:
+    path: /etc/cron.daily/logrotate
+    state: absent
+
+- name: Remove SSL File
+  file:
+    path: /etc/httpd/conf.d/ssl.conf
+    state: absent

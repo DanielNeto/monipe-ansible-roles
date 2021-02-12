@@ -1,0 +1,89 @@
+- name: Get container status
+  shell: docker inspect --format={{ '{{.State.Running}}' }} ps-testpoint 2>&1 | grep -v "No such object" | grep true | wc -l
+  register: status
+
+- name: Add EPEL repository
+  yum:
+    name: epel-release
+    state: latest
+  when: status.stdout == "0"
+
+- name: Install yum utils
+  yum:
+    name: yum-utils
+    state: latest
+  when: status.stdout == "0"
+
+- name: Install device-mapper-persistent-data
+  yum:
+    name: device-mapper-persistent-data
+    state: latest
+  when: status.stdout == "0"
+
+- name: Install lvm2
+  yum:
+    name: lvm2
+    state: latest
+  when: status.stdout == "0"
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  become: yes
+  when: status.stdout == "0"
+
+- name: Enable Docker Edge repo
+  ini_file:
+    dest: /etc/yum.repos.d/docker-ce.repo
+    section: 'docker-ce-edge'
+    option: enabled
+    value: 0
+  become: yes
+  when: status.stdout == "0"
+
+- name: Enable Docker Test repo
+  ini_file:
+    dest: /etc/yum.repos.d/docker-ce.repo
+    section: 'docker-ce-test'
+    option: enabled
+    value: 0
+  become: yes
+  when: status.stdout == "0"
+
+- name: Install Docker
+  package:
+    name: docker-ce
+    state: latest
+  become: yes
+  when: status.stdout == "0"
+
+- name: Install Python PIP Library
+  yum:
+    name: python2-pip
+    state: latest
+  become: yes
+  when: status.stdout == "0"
+
+- name: Install Docker Python Library
+  yum:
+    name: python-docker-py
+    state: latest
+  become: yes
+  when: status.stdout == "0"
+
+- name: Add user perfsonar to docker group
+  user:
+    name: perfsonar
+    groups: docker
+    append: yes
+  become: yes
+  when: status.stdout == "0"
+
+- name: Add user monipeadm to docker group
+  user:
+    name: monipeadm
+    groups: docker
+    append: yes
+  become: yes
+  when: status.stdout == "0"

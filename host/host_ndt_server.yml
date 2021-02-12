@@ -1,0 +1,4 @@
+- name: Host SeLinux
+  hosts: all
+  roles:
+    - { role: host/ndt-server, when: ansible_os_family == "RedHat" }

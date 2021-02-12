@@ -1,0 +1,4 @@
+- name: Run perfSONAR Central Management
+  hosts: all
+  roles:
+    - { role: perfsonar/centralmanagement/run, when: ansible_os_family == "RedHat" }

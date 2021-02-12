@@ -1,0 +1,4 @@
+- name: Docker Prune
+  hosts: all
+  roles:
+    - { role: docker/prune, when: ansible_os_family == "RedHat" }

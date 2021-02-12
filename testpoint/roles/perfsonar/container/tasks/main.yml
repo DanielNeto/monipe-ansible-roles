@@ -1,0 +1,53 @@
+- name: Get TIMEZONE from Host
+  shell: timedatectl | grep "Time zone" | awk -F" " {'print $3'} | xargs
+  register: timezone
+
+- name: Container absent
+  docker_container:
+    name: ps-testpoint
+    state: absent
+  when: (force_container_pull is defined and force_container_pull == true)
+  become: yes
+
+- name: Image absent
+  docker_image:
+    name: danielneto/perfsonar-testpoint:4.2.1
+    source: pull
+    state: absent
+    force_absent: yes
+  when: (force_container_pull is defined and force_container_pull == true)
+  become: yes
+
+- name: Copy memcached config file
+  copy:
+    src: memcached
+    dest: /usr/local/src/memcached
+
+- name: Configure Host SYSCONFIG
+  template:
+    src: pscheduler-agent.json.j2
+    dest: /usr/local/src/pscheduler-agent.json
+
+- name: Docker RUN perfSONAR Testpoint Cointainer
+  docker_container:
+    name: ps-testpoint
+    image: danielneto/perfsonar-testpoint:4.2.1
+    state: started
+    capabilities:
+      - SYS_PTRACE
+    restart_policy: always
+    network_mode: host
+    pull: true
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /usr/local/src/pscheduler-agent.json:/etc/perfsonar/psconfig/pscheduler-agent.json
+      - /usr/local/src/memcached:/etc/sysconfig/memcached
+      - /var/lib/pgsql
+      - /var/log
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    env:
+      TZ: "{{ timezone.stdout }}"
+      container: "docker"
+  become: yes

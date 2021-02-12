@@ -1,0 +1,39 @@
+- name: Add EPEL repository
+  yum:
+    name: epel-release
+    state: latest
+
+- name: Add perfSONAR repository
+  yum:
+    name: http://software.internet2.edu/rpms/el7/x86_64/latest/packages/perfSONAR-repo-0.10-1.noarch.rpm
+    state: present
+
+- name: Install system updates
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
+  ignore_errors: True
+
+- name: Install perfsonar-centralmanagement
+  yum:
+    name:
+      - perfsonar-centralmanagement
+      - perfsonar-toolkit-ntp
+      - perfsonar-toolkit-servicewatcher
+    state: latest
+    update_cache: yes
+  ignore_errors: True
+
+- name: Configure SELINUX
+  replace:
+    path: /etc/selinux/config
+    regexp: 'SELINUX=enforcing'
+    replace: 'SELINUX=permissive'
+    backup: yes
+
+- name: Configure NTP
+  shell: /usr/lib/perfsonar/scripts/configure_ntpd new
+  notify:
+  - restart ntp
+  - start service_watcher

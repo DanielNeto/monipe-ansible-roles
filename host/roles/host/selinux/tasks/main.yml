@@ -1,0 +1,6 @@
+- name: Configure SELINUX
+  replace:
+    path: /etc/selinux/config
+    regexp: 'SELINUX=enforcing'
+    replace: 'SELINUX=permissive'
+    backup: yes

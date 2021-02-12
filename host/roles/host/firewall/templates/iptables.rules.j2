@@ -1,0 +1,49 @@
+#
+# {{ ansible_managed }}
+# Template para endereços reverso
+# FIREWALL GERADO PELO ANSIBLE -- NAO EDITAR
+# 25/11/17
+
+*filter
+:INPUT ACCEPT [3917088:953505170]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [3544591:1259131760]
+:LOG_ACCEPT - [0:0]
+:LOG_REJECT - [0:0]
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+
+
+#Portas TCP
+{% if ((firewall.tcp_ports is defined) and (firewall.tcp_ports))  %}
+{% for port in firewall.tcp_ports %}
+-A INPUT -p tcp -m tcp --dport {{ port.port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+#Portas UDP
+{% if ((firewall.udp_ports is defined) and (firewall.udp_ports))  %}
+{% for port in firewall.udp_ports %}
+-A INPUT -p udp -m udp --dport {{ port.port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+
+#Gerencia PoP-SC
+{% if ((firewall.gerencia_pops is defined) and (firewall.gerencia_pops))  %}
+{% for rede in firewall.gerencia_pops %}
+-A INPUT -s {{ rede.rede  }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+#Redes e hosts liberados somente por este host
+{% if ((firewall_local.redes is defined) and (firewall_local.redes))  %}
+{% for rede in firewall_local.redes %}
+-A INPUT -s {{ rede.ip  }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+-A INPUT -j LOG_REJECT
+-A LOG_ACCEPT -j LOG --log-prefix "[ACCEPT] : " --log-tcp-options --log-ip-options
+-A LOG_ACCEPT -j ACCEPT

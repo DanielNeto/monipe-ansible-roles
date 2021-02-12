@@ -1,0 +1,25 @@
+- name: Install SNMP
+  yum:
+    name: net-snmp
+    state: latest
+    update_cache: yes
+  ignore_errors: True
+
+- name: SNMP Configure
+  template:
+    src: snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+    backup: no
+  notify: restart snmpd
+
+- name: SNMP Start Service
+  systemd:
+    name: snmpd
+    state: started
+    enabled: yes
+
+- name: perfSONAR | Check PPS startup
+  copy:
+    src: ntp_check.sh
+    dest: /usr/local/bin/ntp_check.sh
+    mode: 0755

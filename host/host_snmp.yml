@@ -1,0 +1,4 @@
+- name: Host SNMP
+  hosts: all
+  roles:
+    - { role: host/snmp, when: ansible_os_family == "RedHat" }

@@ -1,0 +1,12 @@
+- name: Docker PULL psConfig Web Administrator Image
+  docker_image:
+    name: "{{ item }}"
+    force: yes
+    state: present
+  become: yes
+  with_items:
+  - mongo
+  - nginx
+  - perfsonar/pwa-pub
+  - perfsonar/pwa-admin
+  - perfsonar/sca-auth

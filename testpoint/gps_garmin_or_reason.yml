@@ -1,0 +1,5 @@
+- name: GPS GARMIN
+  hosts: all
+  roles:
+    - { role: gps/garminorreason, when: ((ansible_os_family == "RedHat") and (gps_model is defined and (gps_model == "garmin" or gps_model == "reason"))) }
+

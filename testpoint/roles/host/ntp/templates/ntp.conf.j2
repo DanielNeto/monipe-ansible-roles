@@ -1,0 +1,40 @@
+# {{ ansible_managed }}
+###############
+# MONIPE - RNP
+#
+# ANSIBLE MANAGED
+#
+# 2018-10-03
+###############
+driftfile /var/lib/ntp/ntp.drift
+statistics loopstats
+statsdir /var/log/ntp/
+logfile /var/log/ntp/ntp.log
+filegen peerstats file peers type day link enable
+filegen loopstats file loops type day link enable
+
+{% if ((gps_model is defined) and (gps_model == "garmin")) %}
+server 127.127.20.0 prefer
+fudge 127.127.20.0 flag1 1 flag2 0 flag3 0 time2 0.600
+{% endif %}
+{% if ((gps_model is defined) and (gps_model == "trimble")) %}
+server 127.127.29.0 prefer
+{% endif %}
+{% if ((gps_model is defined) and (gps_model == "reason")) %}
+server 127.127.20.0 mode 0 minpoll 4 maxpoll 4 prefer
+fudge 127.127.20.0 flag1 1 flag3 1 refid GPS
+{% endif %}
+
+server a.ntp.br iburst
+server b.ntp.br iburst
+
+#LIBERA ACESSO TOTAL PARA LOOPBACK
+restrict 127.0.0.1
+restrict -6 ::1
+
+#NEGA REQUISICOES REDVAR DE TODOS CLIENTES
+restrict 0.0.0.0 mask 0.0.0.0 nomodify noquery
+restrict x.x.x.0 mask 255.255.255.0 nomodify
+restrict :: mask :: nomodify noquery
+
+disable monitor

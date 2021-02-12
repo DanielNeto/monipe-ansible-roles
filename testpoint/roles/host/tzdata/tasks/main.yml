@@ -1,0 +1,5 @@
+- name: Install or update package tzdata
+  yum:
+    name:
+      - tzdata
+    state: latest

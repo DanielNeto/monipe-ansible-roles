@@ -1,0 +1,4 @@
+- name: Docker RUN perfSONAR Testpoint Container
+  hosts: all
+  roles:
+    - { role: perfsonar/container, when: (ansible_os_family == "RedHat") }

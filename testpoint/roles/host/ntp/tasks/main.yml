@@ -1,0 +1,30 @@
+- name: Host NTP Configure
+  template:
+    src: templates/ntp.conf.j2
+    dest: /etc/ntp.conf
+    backup: yes
+
+- name: Install package ntpdate
+  yum:
+    name:
+      - ntp
+      - sntp
+      - ntpdate
+    state: latest
+
+- name: Install package setserial and pps-tools
+  yum:
+    name:
+      - pps-tools
+      - setserial
+    state: latest
+  when: ((ansible_os_family == "RedHat") and (gps_model is defined and (gps_model == "garmin" or gps_model == "reason")))
+
+- name: Adjust Clock for NTP
+  shell: if ! pgrep -x "ntpd" > /dev/null; then ntpdate a.ntp.br ; fi
+
+- name: Start NTPD
+  systemd:
+    name: ntpd
+    state: started
+    enabled: yes

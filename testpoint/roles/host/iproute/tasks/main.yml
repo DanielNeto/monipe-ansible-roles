@@ -1,0 +1,14 @@
+- name: Configure RT_TABLES
+  template:
+    src: templates/rt_tables.j2
+    dest: /etc/iproute2/rt_tables
+
+- name: Configure IP ROUTE
+  shell: |
+    ip rule del table {{ item }}
+    ip route del default via {{ ansible_default_ipv4.gateway }} dev {{ item }} table {{ item }}
+    ip route add default via {{ ansible_default_ipv4.gateway }} dev {{ item }} table {{ item }}
+    ip rule add from {{ hostvars[inventory_hostname]['ansible_%s' | format(item)]['ipv4']['address'] }}/32 table {{ item }}
+  with_items:
+  - "{{ ansible_interfaces }}"
+  when: item is search("ens") and hostvars[inventory_hostname]['ansible_%s' | format(item)]['active'] == true

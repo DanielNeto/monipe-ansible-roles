@@ -1,0 +1,4 @@
+- name: Configure NTP
+  hosts: all
+  roles:
+    - { role: host/ntp, when: ansible_os_family == "RedHat" }

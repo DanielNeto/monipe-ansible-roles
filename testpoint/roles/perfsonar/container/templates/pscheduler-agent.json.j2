@@ -1,0 +1,17 @@
+{
+   "remotes" : [
+{% for mesh in psconfig.meshes %}
+      {
+         "url" : "{{ mesh }}",
+         "configure-archives" : true
+      }{% if not loop.last %},{% endif %}
+      
+{% endfor %}
+   ],
+   "match-addresses" : [
+      {% for address in psconfig.match_addresses %}
+         "{{ address }}"{% if not loop.last %},{% endif %}
+
+      {% endfor %}
+    ]
+}

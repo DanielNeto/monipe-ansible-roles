@@ -1,0 +1,4 @@
+- name: Configure SYSCONFIG
+  hosts: all
+  roles:
+    - { role: host/sysconfig, when: ansible_os_family == "RedHat" }

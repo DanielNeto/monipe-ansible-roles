@@ -1,0 +1,7 @@
+- name: restart ntp
+  service:
+    name: ntpd
+    state: restarted
+
+- name: start service_watcher
+  shell: /usr/lib/perfsonar/scripts/service_watcher

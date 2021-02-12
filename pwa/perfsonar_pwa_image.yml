@@ -1,0 +1,4 @@
+- name: Docker PULL psConfig Web Administrator Image
+  hosts: all
+  roles:
+    - { role: perfsonar/pwa/image, when: ansible_os_family == "RedHat" }

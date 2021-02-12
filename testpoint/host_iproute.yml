@@ -1,0 +1,4 @@
+- name: Configure IPTables
+  hosts: all
+  roles:
+    - { role: host/iproute, when: ansible_os_family == "RedHat" }

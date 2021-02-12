@@ -1,0 +1,37 @@
+#
+# {{ ansible_managed }}
+# Template para endereços reverso
+# FIREWALL V6 GERADO PELO ANSIBLE -- NAO EDITAR
+# 25/11/17
+#
+*filter
+:INPUT ACCEPT [3917088:953505170]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [3544591:1259131760]
+:LOG_ACCEPT - [0:0]
+:LOG_REJECT - [0:0]
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -p ipv6-icmp -j ACCEPT
+
+{% if ((firewall.tcp_ports is defined) and (firewall.tcp_ports))  %}
+{% for port in firewall.tcp_ports %}
+-A INPUT -p tcp -m tcp --dport {{ port.port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+#Portas UDP
+{% if ((firewall.udp_ports is defined) and (firewall.udp_ports))  %}
+{% for port in firewall.udp_ports %}
+-A INPUT -p udp -m udp --dport {{ port.port }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
+#Gerencia PoP-SC
+{% if ((firewall.gerencia_pops6 is defined) and (firewall.gerencia_pops6))  %}
+{% for rede in firewall.gerencia_pops6 %}
+-A INPUT -s {{ rede.rede  }} -j ACCEPT
+{% endfor %}
+{% endif %}
+

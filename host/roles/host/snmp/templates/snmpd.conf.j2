@@ -1,0 +1,56 @@
+agentAddress  udp:0.0.0.0:161
+#
+#
+################################
+# CONTATO E LOCALIZACAO
+#
+sysname         MONIPE - RNP PERFSONAR
+syscontact      MONIPE
+syslocation     BRASIL
+#
+
+{% if ((snmp.communities is defined) and (snmp.communities)) %}
+{%  for communities in snmp.communities %}
+{%   if ((communities.peer is defined) and (communities.peer)) %}
+{%    if ((communities.community is defined) and (communities.community)) %}
+rocommunity {{ communities.community }} {{ communities.peer }}
+{%    endif %}
+{%   endif %}
+{%  endfor %}
+{% endif %}
+
+{% if ((snmp_local.communities is defined) and (snmp_local.communities)) %}
+{%  for communities in snmp_local.communities %}
+{%   if ((communities.peer is defined) and (communities.peer)) %}
+{%    if ((communities.community is defined) and (communities.community)) %}
+rocommunity {{ communities.community }} {{ communities.peer }}
+{%    endif %}
+{%   endif %}
+{%  endfor %}
+{% endif %}
+
+################################
+# MONITORAMENTO DE PROCESSOS    - OID: .1.3.6.1.4.1.2021.2.1
+#                                               TRIGGERS           .1.3.6.1.4.1.2021.2.1.100
+# MONITORAMENTO DE DISCOS               - OID: .1.3.6.1.4.1.2021.9.1
+#                                               TRIGGERS           .1.3.6.1.4.1.2021.9.1.100
+# MONITORAMENTO CARGA MEDIA             - OID: .1.3.6.1.4.1.2021.10.1.3
+# MONITORAMENTO CPU                             - OID: .1.3.6.1.4.1.2021.11
+# MEMORIA                                               - OID: .1.3.6.1.4.1.2021.4
+#
+# DESCOMENTAR AS LINHAS DO(S) PROCESSO(S) QUE EXISTE(M) NO SERVIDOR
+#
+
+{% if ((snmp is defined) and (snmp)) %}
+{%  for processes in snmp.processes %}
+{%   if ((processes.process is defined) and (processes.process)) %}
+proc {{ processes.process }}
+{%   endif %}
+{%  endfor %}
+{% endif %}
+
+load   12 10 5
+
+includeAllDisks 10%
+
+extend ntp_status /usr/local/bin/ntp_check.sh

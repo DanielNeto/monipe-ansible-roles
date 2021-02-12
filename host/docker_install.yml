@@ -1,0 +1,4 @@
+- name: Docker Install
+  hosts: all
+  roles:
+    - { role: docker/install, when: ansible_os_family == "RedHat" }

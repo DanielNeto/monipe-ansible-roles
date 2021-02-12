@@ -1,0 +1,49 @@
+- name: FIREWALL | Install latest version of "iptables"
+  yum:
+    name: iptables
+    state: latest
+
+- name: FIREWALL | create iptables.rules if not exists
+  copy:
+    content: ""
+    dest: /etc/firewalld/iptables.rules
+    owner: root
+    group: root
+    mode: 0644
+    force: no
+
+- name: FIREWALL | create ip6tables.rules if not exists
+  copy:
+    content: ""
+    dest: /etc/firewalld/ip6tables.rules
+    owner: root
+    group: root
+    mode: 0644
+    force: no
+
+- name: FIREWALL | Script Firewall - INIT
+  copy:
+    src: firewall
+    dest: /etc/init.d/firewall
+    mode: 0755
+  notify: boot firewall
+
+- name: FIREWALL | Script Firewall - enable
+  systemd:
+    name: firewall 
+    enabled: yes
+    state: stopped 
+
+- name: FIREWALL | Script Firewall - start 
+  systemd:
+    name: firewall 
+    state: started 
+
+- name: FIREWALL | Iptables
+  template: src=iptables.rules.j2 dest=/etc/firewalld/iptables.rules backup=no
+  notify: restart firewall
+  
+- name: FIREWALL | Iptables
+  template: src=ip6tables.rules.j2 dest=/etc/firewalld/ip6tables.rules backup=no
+  notify: restart firewall
+  

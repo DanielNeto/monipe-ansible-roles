@@ -1,0 +1,59 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          firewall 
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Iniciar script de firewall no boot do sistema
+### END INIT INFO
+
+#
+# Script para Iniciar o Firewall automaticamente
+# Configure em /etc/init.d
+# guilherme.rhoden@pop-sc.rnp.br / paulo.brandtner@pop-sc.rnp.br
+#
+
+set -e
+
+CONF=/etc/firewalld/iptables.rules
+CONF6=/etc/firewalld/ip6tables.rules
+CMD=/usr/sbin/iptables
+CMD6=/usr/sbin/ip6tables
+CMDRESTORE=/usr/sbin/iptables-restore
+CMDRESTORE6=/usr/sbin/ip6tables-restore
+CMDSAVE=/usr/sbin/iptables-save
+
+case "$1" in
+start)
+echo "Iniciando Firewall [4 e 6]..."
+$CMDRESTORE -c $CONF
+$CMDRESTORE6 -c $CONF6
+echo "Feito"
+;;
+save)
+echo -n "Salvando as regras de firewall da memoria para ${CONF}"
+$CMDSAVE > $CONF
+echo " Feito!"
+;;
+stop)
+echo "Parando Firewall.."
+$CMD -F
+$CMD6 -F
+echo "."
+;;
+list)
+echo "Listando regras de Firewall.."
+echo "----------------------------------------------------"
+$CMD -L
+echo "----------------------------------------------------"
+echo "."
+;;
+*)
+N=/etc/init.d/firewall
+echo "Usage: $N {start|list|save|stop}" >&2
+exit 1
+;;
+esac
+exit 0
